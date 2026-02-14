@@ -71,6 +71,11 @@ public class PostService {
         }
 
         PostMapper.applyUpdate(request, post, DateTimeUtil.now());
+
+        if (request.title() != null && !request.title().isBlank()) {
+            post.setSlug(ensureUniqueSlugExcluding(SlugUtil.toSlug(post.getTitle()), id));
+        }
+
         post = blogRepository.save(post);
         return PostMapper.toPostResponse(post);
     }
@@ -96,6 +101,15 @@ public class PostService {
         String slug = baseSlug;
         int counter = 1;
         while (blogRepository.findBySlug(slug).isPresent()) {
+            slug = baseSlug + "-" + counter++;
+        }
+        return slug;
+    }
+
+    private String ensureUniqueSlugExcluding(String baseSlug, Long excludeId) {
+        String slug = baseSlug;
+        int counter = 1;
+        while (blogRepository.findBySlugAndIdNot(slug, excludeId).isPresent()) {
             slug = baseSlug + "-" + counter++;
         }
         return slug;

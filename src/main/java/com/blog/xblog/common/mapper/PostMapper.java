@@ -68,8 +68,12 @@ public final class PostMapper {
             return;
         }
 
-        entity.setTitle(request.title());
-        entity.setContent(request.content());
+        if (request.title() != null && !request.title().isBlank()) {
+            entity.setTitle(request.title().trim());
+        }
+        if (request.content() != null && !request.content().isBlank()) {
+            entity.setContent(request.content().trim());
+        }
         entity.setUpdatedAt(updatedAt);
     }
 }

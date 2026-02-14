@@ -52,11 +52,12 @@ public final class UserMapper {
     }
 
     public static void applyProfileUpdate(UserProfileUpdateRequest request, UserEntity entity) {
-        if (request == null || entity == null) {
-            return;
+        if (request.username() != null && !request.username().isBlank()) {
+            entity.setUsername(request.username().trim());
         }
-
-        entity.setUsername(request.username());
-        entity.setEmail(request.email());
+        if (request.email() != null && !request.email().isBlank()) {
+            entity.setEmail(request.email().trim());
+        }
     }
+
 }
