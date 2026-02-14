@@ -18,9 +18,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +43,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.blog.xblog.blog.post.dto.PostCreateRequest;
 import com.blog.xblog.blog.post.dto.PostResponse;
@@ -71,6 +77,17 @@ class PostControllerTest {
         PostController controller = new PostController(postService);
         mockMvc = standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
+                .addFilter(new OncePerRequestFilter() {
+                    @Override
+                    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                                    FilterChain filterChain) throws ServletException, IOException {
+                        try {
+                            filterChain.doFilter(request, response);
+                        } finally {
+                            SecurityContextHolder.clearContext();
+                        }
+                    }
+                })
                 .build();
     }
 
@@ -222,6 +239,8 @@ class PostControllerTest {
         @Test
         @DisplayName("returns 201 and post when authenticated and valid body")
         void returns201WhenValid() throws Exception {
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(PRINCIPAL, null, PRINCIPAL.getAuthorities()));
             when(postService.createPost(anyLong(), any(PostCreateRequest.class))).thenReturn(SAMPLE_POST);
 
             mockMvc.perform(post("/api/posts")
