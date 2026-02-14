@@ -9,6 +9,7 @@ public record PostResponse(
         String content,
         Long authorId,
         String authorUsername,
+        String imageUrl,
         Instant createdAt,
         Instant updatedAt
 ) {}

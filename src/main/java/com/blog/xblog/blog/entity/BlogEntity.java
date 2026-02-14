@@ -60,13 +60,17 @@ public class BlogEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     public BlogEntity(Long id,
                       String title,
                       String slug,
                       String content,
                       UserEntity author,
                       Instant createdAt,
-                      Instant updatedAt) {
+                      Instant updatedAt,
+                      String imagePath) {
         this.id = id;
         this.title = title;
         this.slug = slug;
@@ -74,10 +78,11 @@ public class BlogEntity {
         this.author = author;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.imagePath = imagePath;
     }
 
     public BlogEntity(String title, String slug, String content, UserEntity author) {
-        this(null, title, slug, content, author, Instant.now(), Instant.now());
+        this(null, title, slug, content, author, Instant.now(), Instant.now(), null);
     }
 }
 

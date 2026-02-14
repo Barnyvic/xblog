@@ -22,6 +22,10 @@ public final class PostMapper {
 
         UserEntity author = entity.getAuthor();
 
+        String imageUrl = entity.getImagePath() != null && !entity.getImagePath().isBlank()
+                ? "/api/posts/" + entity.getId() + "/image"
+                : null;
+
         return new PostResponse(
                 entity.getId(),
                 entity.getTitle(),
@@ -29,6 +33,7 @@ public final class PostMapper {
                 entity.getContent(),
                 author != null ? author.getId() : null,
                 author != null ? author.getUsername() : null,
+                imageUrl,
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
